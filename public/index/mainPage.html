@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html ng-app="app">
+
+<head>
+  <style>
+    .sortorder:after {
+      content: "\25b2";
+    }
+
+    .sortorder.reverse:after {
+      content: "\25bc";
+    }
+  </style>
+  <meta charset="utf-8" />
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+    integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous" />
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+  <script src="viewController.js"></script>
+
+  <title>File Loading Service</title>
+</head>
+
+<body ng-controller="myController">
+
+
+  <table class="table">
+    <tbody>
+      <tr>
+        <td>
+          <input type="text" class="form-control" ng-model="loginForm.email" placeholder="admin@admin.ad"
+             />
+        </td>
+        <td>
+          <input type="text" class="form-control" ng-model="loginForm.password" placeholder="adminpass"
+             />
+        </td>
+
+
+        <td>
+          <button class="btn btn-primary" ng-click="loginClick()">
+            Login
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
+  <div>
+    <h1>Owner List</h1>
+
+    <pre>
+Selected Owner {{selectedOwnerName}} From {{selectedOwnerOrganization}}</pre>
+
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>
+            <button ng-click="sortOwnersBy('name')">Name</button>
+            <span class="sortorder" ng-show="ownerSortPropertyName === 'name'"
+              ng-class="{reverse: ownerSortReverse}"></span>
+          </th>
+          <th>
+            <button ng-click="sortOwnersBy('organization')">
+              Organization
+            </button>
+            <span class="sortorder" ng-show="ownerSortPropertyName === 'owner'"
+              ng-class="{reverse: ownerSortReverse}"></span>
+          </th>
+          <th>
+            <button ng-click="sortOwnersBy('description')">
+              Description
+            </button>
+            <span class="sortorder" ng-show="ownerSortPropertyName === 'pages'"
+              ng-class="{reverse: ownerSortReverse}"></span>
+          </th>
+          <th>
+            <button ng-click="sortOwnersBy('creationDate')">
+              Creation Date
+            </button>
+            <span class="sortorder" ng-show="ownerSortPropertyName === 'data'"
+              ng-class="{reverse: ownerSortReverse}"></span>
+          </th>
+          <th>
+            <button ng-click="sortOwnersBy('email')">
+              Email
+            </button>
+            <span class="sortorder" ng-show="ownerSortPropertyName === 'email'"
+              ng-class="{reverse: ownerSortReverse}"></span>
+          </th>
+          <th>
+            <button ng-click="ownerSortPropertyName = null; ownerSortReverse = false">
+              Set to unsorted
+            </button>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="owner in owners | orderBy:ownerSortPropertyName:ownerSortReverse">
+          <td>{{owner.name | uppercase }}</td>
+          <td>{{owner.organization}}</td>
+          <td>{{owner.description}}</td>
+          <td>{{owner.creationDate | date}}</td>
+          <td>{{owner.email}}</td>
+
+          <!-- Apparently, the whole object is saved, so the file._id for each file, (although not displayed) is still alive-->
+          <td>
+            <button class="btn btn-info" ng-click="selectOwner(owner._id,owner.name,owner.organization)">
+              Select
+            </button>
+          </td>
+          <td>
+            <button class="btn btn-danger" ng-click="removeOwner(owner._id)">
+              Delete
+            </button>
+          </td>
+          <td>
+            <button class="btn btn-warning" ng-click="editOwner(owner._id)">
+              Edit
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>
+            <input class="form-control" ng-model="newOwner.email" placeholder="email" />
+          </td>
+          <td>
+            <input class="form-control" ng-model="newOwner.password" placeholder="pass" />
+          </td>
+          <td>
+            <input class="form-control" ng-model="newOwner.name" placeholder="name" />
+          </td>
+          <td>
+            <input class="form-control" ng-model="newOwner.organization" placeholder="unicen" />
+          </td>
+          <td>
+            <input class="form-control" ng-model="newOwner.description" placeholder="description" />
+          </td>
+
+          <td>
+            <button class="btn btn-success" ng-click="addOwner()">
+              Add Owner
+            </button>
+          </td>
+          <td>
+            <button class="btn btn-primary" ng-click="updateOwner()">
+              Update Owner
+            </button>
+            <button class="btn btn-primary" ng-click="cleanOwnerField()">
+              Clean Owner
+            </button>
+            <button class="btn btn-info" ng-click="unsetOwner()">
+              Deselect Owner
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <h1>File List</h1>
+
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>
+            <button ng-click="sortPdfBy('name')">Pdf Name</button>
+            <!-- these span are the little arrows that show when clicking the sort buttons-->
+            <span class="sortorder" ng-show="pdfSortPropertyName === 'name'"
+              ng-class="{reverse: pdfSortReverse}"></span>
+          </th>
+          <th>
+            <button ng-click="sortPdfBy('pages')">Pdf Pages</button>
+            <span class="sortorder" ng-show="pdfSortPropertyName === 'pages'"
+              ng-class="{reverse: pdfSortReverse}"></span>
+          </th>
+          <th>
+            <button ng-click="sortPdfBy('data')">Pdf Data</button>
+            <span class="sortorder" ng-show="pdfSortPropertyName === 'data'"
+              ng-class="{reverse: pdfSortReverse}"></span>
+          </th>
+          <th>
+            <button ng-click="sortPdfBy('uploadDate')">Pdf Date</button>
+            <span class="sortorder" ng-show="pdfSortPropertyName === 'uploadDate'"
+              ng-class="{reverse: pdfSortReverse}"></span>
+          </th>
+          <th>
+            <button ng-click="pdfSortPropertyName = null; pdfSortReverse = false">
+              Set to unsorted
+            </button>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="file in files | orderBy:pdfSortPropertyName:pdfSortReverse">
+          <td>{{file.name | uppercase }}</td>
+          <td>{{file.pages}}</td>
+          <td>{{file.data}}</td>
+          <td>{{file.uploadDate | date}}</td>
+          <td>
+            <button class="btn btn-success" ng-click="downloadFile2(file._id)">
+              Download
+            </button>
+          </td>
+          <td>
+            <!-- Apparently, the whole object is saved, so the file._id for each file, (although not displayed) is still alive-->
+            <button class="btn btn-danger" ng-click="removeFile(file._id)">
+              Delete
+            </button>
+          </td>
+          <td>
+            <button class="btn btn-warning" ng-click="editFile(file._id)">
+              Edit
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>
+            <input type="file" accept=".pdf" />
+          </td>
+          <td>
+            <input class="form-control" ng-model="newFile.name" placeholder="title" />
+          </td>
+          <td>
+            <input type="number" class="form-control" ng-model="newFile.pages" placeholder="50" min="1" />
+          </td>
+          <td>
+            <input class="form-control" ng-model="newFile.data" placeholder="data" />
+          </td>
+
+          <td>
+            <button class="btn btn-success" ng-click="addFile()">
+              Add File
+            </button>
+          </td>
+          <td>
+            <button class="btn btn-primary" ng-click="updateFile()">
+              Update File
+            </button>
+            <button class="btn btn-primary" ng-click="cleanFileField()">
+              Clean File
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+
+</html>
