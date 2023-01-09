@@ -5,7 +5,7 @@ const dbName = "bibliography";
 const fileCollectionName = "inventory";
 const ownerCollectionName = "owners";
 
-const url = "mongodb://Thomas:pwd@127.0.0.1:27017/" + dbName;
+const url = "mongodb://Thomas:pwd@localhost:27017/" + dbName;
 
 var Schema = mongoose.Schema;
 
