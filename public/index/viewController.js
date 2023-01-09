@@ -62,7 +62,7 @@ angular.module("app", []).controller("myController", function ($scope, $http) {
 
   $scope.loginClick = function() {
     $http
-      .post("api/auth/login", $scope.loginForm)
+      .post("https://fileuploadbackend.onrender.com/api/auth/login", $scope.loginForm)
       .then(
         function (response) {
           accessToken = response.data.token;
