@@ -5,7 +5,10 @@ const dbName = "bibliography";
 const fileCollectionName = "inventory";
 const ownerCollectionName = "owners";
 
-const url = "mongodb://Thomas:pwd@localhost:27017/" + dbName;
+var url = "mongodb://Thomas:pwd@127.0.0.1:27017/" + dbName;
+
+url = "mongodb+srv://FileUploadWebsiteBackend:FileUploadWebsiteBackendpassword@cluster0.ld8wp55.mongodb.net/?retryWrites=true&w=majority"
+
 
 var Schema = mongoose.Schema;
 
